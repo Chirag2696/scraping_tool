@@ -8,6 +8,7 @@ from scraper.storage import Storage
 from scraper.cache import Cache
 from scraper.notifier import Notifier
 from typing import Optional
+from fake_useragent import UserAgent
 
 class Scraper:
     def __init__(self, pages: Optional[int] = None, proxy: Optional[str] = None):
@@ -25,9 +26,15 @@ class Scraper:
 
     def get_page(self, url: str) -> Optional[str]:
         attempts = 0
+        headers = {
+            'User-Agent': UserAgent().random,
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer': 'https://www.google.com'
+        }
         while attempts < DEFAULT_RETRIES:
             try:
-                response = requests.get(url, proxies=self.proxy, timeout=10)
+                response = requests.get(url, proxies=self.proxy, headers=headers, timeout=10)
                 if response.status_code == 200:
                     return response.text
                 else:
@@ -42,17 +49,18 @@ class Scraper:
     def parse_products(self, html: str) -> list:
         soup = BeautifulSoup(html, 'html.parser')
         # Adjust the selectors below based on the actual website structure
-        product_elements = soup.find_all('div', class_='product')
+        # product_elements = soup.find_all('div', class_='product')
+        product_elements = soup.find_all('li', class_='product')
         products = []
         for elem in product_elements:
             try:
-                title_elem = elem.find('h2', class_='woocommerce-loop-product__title')
+                title_elem = elem.find('h2', class_='woo-loop-product__title')
                 price_elem = elem.find('span', class_='woocommerce-Price-amount')
                 image_elem = elem.find('img')
                 if title_elem and price_elem and image_elem:
                     product_title = title_elem.get_text(strip=True)
                     # Remove currency symbols and commas
-                    price_text = price_elem.get_text(strip=True).replace('$', '').replace(',', '')
+                    price_text = price_elem.get_text(strip=True).replace('$', '').replace('₹', '').replace(',', '')
                     product_price = float(price_text)
                     image_src = image_elem.get('src')
                     # Download the image locally
@@ -101,6 +109,8 @@ class Scraper:
             url = BASE_URL if page_number == 1 else f"{BASE_URL}page/{page_number}/"
             print(f"Scraping URL: {url}")
             html = self.get_page(url)
+            with open("debug_page.html", "w", encoding="utf-8") as f:
+                f.write(html)
             if not html:
                 # Stop if the page cannot be fetched after retries
                 break
@@ -119,4 +129,5 @@ class Scraper:
                     self.cache.set(product.product_title, product.product_price)
             page_number += 1
         self.notifier.notify(self.total_scraped, self.total_updated)
+        print("Cache contents:", self.cache.dump())
         return f"Scraping completed. Total products scraped: {self.total_scraped}. Updated: {self.total_updated}"

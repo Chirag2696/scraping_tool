@@ -11,3 +11,10 @@ class Cache:
 
     def exists(self, key: str) -> bool:
         return key in self._cache
+    
+    def clear(self):
+        self._cache.clear()
+
+    def dump(self):
+        return self._cache
+
