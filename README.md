@@ -37,3 +37,7 @@ scraper_tool/
 
    Endpoint: POST http://localhost:8000/scrape
    Headers: Authorization: Bearer <your_token>  <!-- my_secure_token_123 -->
+   Request Body (JSON): {
+         "pages": 5,
+         "proxy": "http://your-proxy:port"  // Optional
+      }
