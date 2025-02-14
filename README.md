@@ -36,8 +36,8 @@ scraper_tool/
 3. **Test the API Endpoint:**
 
    Endpoint: POST http://localhost:8000/scrape
-   Headers: Authorization: Bearer <your_token>  <!-- my_secure_token_123 -->
+   Headers: Authorization: Bearer <your_token>     // check STATIC_TOKEN in config.py
    Request Body (JSON): {
-         "pages": 5,
-         "proxy": "http://your-proxy:port"  // Optional
+         "pages": 5,    // No. of pages to scrape
+         "proxy": "http://your-proxy:port"    // Optional
       }
