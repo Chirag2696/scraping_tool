@@ -25,15 +25,23 @@ scraper_tool/
 
 ## Setup & Usage
 
-1. **Install Dependencies:**
+1. **Clone the repo:**
+
+   git clone https://github.com/Chirag2696/scraping_tool.git
+
+2. **Navigate to the Project Folder:**
+
+   cd scraping_tool
+
+3. **Install Dependencies:**
 
    pip install -r requirements.txt
 
-2. **Run the Application:**
+4. **Run the Application:**
 
    uvicorn main:app --reload
 
-3. **Test the API Endpoint:**
+5. **Test the API Endpoint:**
 
    Endpoint: POST http://localhost:8000/scrape
    Headers: Authorization: Bearer <your_token>     // check STATIC_TOKEN in config.py
